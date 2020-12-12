@@ -1,6 +1,8 @@
 from sklearn.impute import KNNImputer
 from utils import *
 
+import matplotlib.pyplot as plt
+import numpy as np
 
 def knn_impute_by_user(matrix, valid_data, k):
     """ Fill in the missing values using k-Nearest Neighbors based on
@@ -19,7 +21,7 @@ def knn_impute_by_user(matrix, valid_data, k):
     # We use NaN-Euclidean distance measure.
     mat = nbrs.fit_transform(matrix)
     acc = sparse_matrix_evaluate(valid_data, mat)
-    print("Validation Accuracy: {}".format(acc))
+    print("Validation Accuracy User-based with k = {} : {}".format(k, acc))
     return acc
 
 
@@ -40,7 +42,7 @@ def knn_impute_by_item(matrix, valid_data, k):
     nbrs = KNNImputer(n_neighbors=k)
     mat = nbrs.fit_transform(matrix.T)
     acc = sparse_matrix_evaluate(valid_data, mat.T)
-    print("Validation Accuracy: {}".format(acc))
+    print("Validation Accuracy Item_based with k = {} : {}".format(k, acc))
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
@@ -77,6 +79,22 @@ def main():
         
     print("Best k for user is", best_k_user, "with test acc:", test_user)
     print("Best k for item is", best_k_item, "with test acc:", test_item)
+    
+    title = 'Accuracy on Validation Data User-based'
+    acc = accuracy_user
+    for i in range(2):
+    # Generate the plot for validation accuracy.
+        if (i == 1):
+            title = 'Accuracy on Validation Data Item-based'
+            acc = accuracy_item
+        plt.figure()
+        plt.title(title)    
+        plt.plot(k_set, acc, label="valiadtion")
+        plt.xlabel("k")
+        plt.xticks(k_set)
+        plt.ylabel("accuracy")
+        plt.legend()
+        plt.show()        
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
