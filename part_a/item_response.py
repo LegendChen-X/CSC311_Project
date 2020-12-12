@@ -23,14 +23,12 @@ def neg_log_likelihood(data, theta, beta):
     #####################################################################
     # TODO:                                                             #
     # Implement the function as described in the docstring.             #
-    #####################################################################
-    log_lklihood = 0.
-    for i in range(len(data["question_id"])):
-        user_id = data["question_id"][i]
-        theta = theta[user_id]
-        beta = beta[data["question_id"][i]]
-        correct = data["is_correct"][i]
-        log_lklihood += correct * ((theta - beta) - np.log(1 + np.exp(theta - beta)))
+    #####################################################################       
+    user_id = data['user_id']
+    question_id = data['question_id']
+    is_correct = data['is_correct']
+    log_cij = lambda x :  is_correct[x] * np.log(sigmoid(theta[user_id[x]] - beta[question_id[x]])) + (1 - is_correct[x]) * np.log(1 - sigmoid(theta[user_id[x]] - beta[question_id[x]]))
+    log_lklihood = np.sum([log_cij(x) for x in range(len(is_correct))])
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
