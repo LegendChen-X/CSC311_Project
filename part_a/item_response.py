@@ -25,7 +25,7 @@ def neg_log_likelihood(data, theta, beta):
     # Implement the function as described in the docstring.             #
     #####################################################################
     log_lklihood = 0.
-    for i in range(data["question_id"]):
+    for i in range(len(data["question_id"])):
         user_id = data["question_id"][i]
         theta = theta[user_id]
         beta = beta[data["question_id"][i]]
@@ -120,7 +120,6 @@ def main():
     sparse_matrix = load_train_sparse("../data")
     val_data = load_valid_csv("../data")
     test_data = load_public_test_csv("../data")
-
     #####################################################################
     # TODO:                                                             #
     # Tune learning rate and number of iterations. With the implemented #
