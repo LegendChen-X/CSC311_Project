@@ -70,7 +70,7 @@ class AutoEncoder(nn.Module):
         # Implement the function as described in the docstring.             #
         # Use sigmoid activations for f and g.                              #
         #####################################################################
-        out = inputs
+        out = torch.sigmoid(self.h(torch.sigmoid(self.g(inputs))))
         #####################################################################
         #                       END OF YOUR CODE                            #
         #####################################################################
@@ -162,16 +162,17 @@ def main():
     # validation set.                                                   #
     #####################################################################
     # Set model hyperparameters.
-    k = None
-    model = None
+    k_set = [10, 50, 100, 200, 500]
 
     # Set optimization hyperparameters.
-    lr = None
-    num_epoch = None
-    lamb = None
-
-    train(model, lr, lamb, train_matrix, zero_train_matrix,
-          valid_data, num_epoch)
+    lr = 0.05
+    num_epoch = 35
+    lamb = 0.01
+    
+    for k in k_set:
+        print("K is", k)
+        model = AutoEncoder(zero_train_matrix.shape[1], k)
+        train(model, lr, lamb, train_matrix, zero_train_matrix, valid_data, num_epoch)
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
