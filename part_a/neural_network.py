@@ -166,7 +166,7 @@ def main():
 
     # Set optimization hyperparameters.
     lr = 0.05
-    num_epoch = 35
+    num_epoch = 10
     lamb = 0.01
     
     for k in k_set:
