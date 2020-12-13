@@ -123,9 +123,7 @@ def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch, f
             train_loss += loss.item()
             optimizer.step()
             
-        if flag:
-            regularization = lamb/2 *model.get_weight_norm()
-            train_loss += regularization
+        if flag: train_loss += lamb/2 *model.get_weight_norm()
 
         valid_acc = evaluate(model, zero_train_data, valid_data)
         print("Epoch: {} \tTraining Cost: {:.6f}\t "
