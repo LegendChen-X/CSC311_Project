@@ -1,6 +1,7 @@
 from utils import *
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def sigmoid(x):
@@ -56,7 +57,22 @@ def update_theta_beta(data, lr, theta, beta):
     # TODO:                                                             #
     # Implement the function as described in the docstring.             #
     #####################################################################
-    pass
+    user_id = data["user_id"]
+    question_id = data["question_id"]
+    is_correct = data["is_correct"]
+    for i in range(len(is_correct)):
+        # Find the index for user and question
+        u = user_id[i]
+        q = question_id[i]
+        # Update theta[u]
+        sig = sigmoid(theta[u] - beta[q])
+        dtheta = sig - is_correct[i]
+        theta[u] -= lr*dtheta
+        # Update beta[q]
+        sig = sigmoid(theta[u] - beta[q])
+        dbeta = is_correct[i] - sig
+        beta[q] -= lr*dbeta
+        
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
@@ -77,20 +93,34 @@ def irt(data, val_data, lr, iterations):
     :return: (theta, beta, val_acc_lst)
     """
     # TODO: Initialize theta and beta.
-    theta = None
-    beta = None
+    theta = np.random.rand(542)
+    beta = np.random.rand(1774)
 
     val_acc_lst = []
+    best_theta = 0
+    best_beta = 0
+    best_score = 0
+    train_neg_lld_lst = []
+    valid_neg_lld_lst = []
 
     for i in range(iterations):
         neg_lld = neg_log_likelihood(data, theta=theta, beta=beta)
+        train_neg_lld_lst.append(neg_lld)
+        val_neg_lld = neg_log_likelihood(val_data, theta=theta, beta=beta)
+        valid_neg_lld_lst.append(val_neg_lld)
         score = evaluate(data=val_data, theta=theta, beta=beta)
         val_acc_lst.append(score)
         print("NLLK: {} \t Score: {}".format(neg_lld, score))
         theta, beta = update_theta_beta(data, lr, theta, beta)
+        if (score > best_score):
+            best_score = score
+            best_theta = theta
+            best_beta = beta
 
     # TODO: You may change the return values to achieve what you want.
-    return theta, beta, val_acc_lst
+    valid_acc = evaluate(data=val_data, theta=best_theta, beta=best_beta)
+    print("Final validation accuracy is {}".format(valid_acc))
+    return best_theta, best_beta, val_acc_lst, train_neg_lld_lst, valid_neg_lld_lst
 
 
 def evaluate(data, theta, beta):
@@ -123,7 +153,31 @@ def main():
     # Tune learning rate and number of iterations. With the implemented #
     # code, report the validation and test accuracy.                    #
     #####################################################################
-    pass
+    # Set the hyper parameters
+    lr = 0.002
+    iterations = 160
+    theta, beta, val_acc_lst, train_neg_lld_lst, valid_neg_lld_lst = irt(train_data, val_data, lr, iterations)
+    x_axis = [*range(iterations)]
+    
+    plt.figure(1)
+    plt.title('Negative Log-likelihood')
+    plt.plot(x_axis, train_neg_lld_lst, color='green', label='training')
+    plt.plot(x_axis, valid_neg_lld_lst, color='blue', label='validation')
+    plt.legend()
+    plt.xlabel('iteration times')
+    plt.ylabel('NLLK')
+    plt.show()    
+    
+    train_lld_lst = [-x for x in train_neg_lld_lst]
+    valid_lld_lst = [-x for x in valid_neg_lld_lst]
+    plt.figure(2)
+    plt.title('Log-likelihood')
+    plt.plot(x_axis, train_lld_lst, color='green', label='training')
+    plt.plot(x_axis, valid_lld_lst, color='blue', label='validation')
+    plt.legend()
+    plt.xlabel('iteration times')
+    plt.ylabel('LLK')
+    plt.show()       
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
@@ -132,7 +186,10 @@ def main():
     # TODO:                                                             #
     # Implement part (c)                                                #
     #####################################################################
-    pass
+    valid_acc = evaluate(data=val_data, theta=theta, beta=beta)
+    print("Final validation accuracy is {}".format(valid_acc))
+    test_acc = evaluate(data=test_data, theta=theta, beta=beta)
+    print("Final test accuracy is {}".format(test_acc))
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
