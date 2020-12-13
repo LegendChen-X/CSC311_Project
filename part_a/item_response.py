@@ -97,9 +97,9 @@ def irt(data, val_data, lr, iterations):
     beta = np.random.rand(1774)
 
     val_acc_lst = []
-    best_theta = 0
-    best_beta = 0
-    best_score = 0
+    best_theta = None
+    best_beta = None
+    best_score = 0.0
     train_neg_lld_lst = []
     valid_neg_lld_lst = []
 
@@ -111,8 +111,8 @@ def irt(data, val_data, lr, iterations):
         score = evaluate(data=val_data, theta=theta, beta=beta)
         if (score > best_score):
             best_score = score
-            best_theta = theta
-            best_beta = beta        
+            best_theta = theta.copy()
+            best_beta = beta.copy()
         val_acc_lst.append(score)
         print("NLLK: {} \t Score: {}".format(neg_lld, score))
         theta, beta = update_theta_beta(data, lr, theta, beta)

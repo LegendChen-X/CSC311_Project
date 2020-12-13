@@ -14,7 +14,6 @@ def sampleMat(matrix):
     indexes = np.random.randint(matrix.shape[0], size=matrix.shape[0])
     sampleMat = matrix[indexes, :]
     return sampleMat
-    
 
 def knn(sampleMat, validData):
     res = []
@@ -37,12 +36,12 @@ def bag(trainData, validData):
     knn_res = knn(sample(trainData), validData)
     ir_res = ir(sample(trainData), validData)
     nn_res = nn(sample(trainData), validData)
-    
     final_res = (knn_res + ir_res + nn_res) / 3
+    predict = np.zereos((len(final_res), ), dtype="float")
+    for i in range(len(final_res)):
+        if i < 0.5: predict[i] = 0
+        else: predict[i] = 1
     
-    
-    
-
 def main():
     train_data = load_train_csv("../data")
     val_data = load_valid_csv("../data")
