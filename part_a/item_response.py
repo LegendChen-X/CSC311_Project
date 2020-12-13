@@ -154,6 +154,7 @@ def main():
     # Set the hyper parameters
     lr = 0.002
     iterations = 160
+    np.random.seed(299)
     theta, beta, val_acc_lst, train_neg_lld_lst, valid_neg_lld_lst = irt(train_data, val_data, lr, iterations)
     x_axis = [*range(iterations)]
     

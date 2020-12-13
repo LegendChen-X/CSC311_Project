@@ -42,13 +42,11 @@ def knn_impute_by_item(matrix, valid_data, k):
     nbrs = KNNImputer(n_neighbors=k)
     mat = nbrs.fit_transform(matrix.T)
     acc = sparse_matrix_evaluate(valid_data, mat.T)
-    print(mat)
     print("Validation Accuracy Item_based with k = {} : {}".format(k, acc))
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
     return acc
-
 
 def main():
     sparse_matrix = load_train_sparse("../data").toarray()
@@ -71,10 +69,12 @@ def main():
     accuracy_item = []
     for k in k_set:
         accuracy_user.append(knn_impute_by_user(sparse_matrix,val_data,k))
-        accuracy_item.append(knn_impute_by_item(sparse_matrix,val_data,k))
         best_k_user = k_set[accuracy_user.index(max(accuracy_user))]
+    
+    for k in k_set:
+        accuracy_item.append(knn_impute_by_item(sparse_matrix,val_data,k))
         best_k_item = k_set[accuracy_item.index(max(accuracy_item))]
-        
+         
     test_user = knn_impute_by_user(sparse_matrix,test_data,best_k_user)
     test_item = knn_impute_by_item(sparse_matrix,test_data,best_k_item)
         
