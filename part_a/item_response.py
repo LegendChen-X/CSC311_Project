@@ -109,17 +109,15 @@ def irt(data, val_data, lr, iterations):
         val_neg_lld = neg_log_likelihood(val_data, theta=theta, beta=beta)
         valid_neg_lld_lst.append(val_neg_lld)
         score = evaluate(data=val_data, theta=theta, beta=beta)
-        val_acc_lst.append(score)
-        print("NLLK: {} \t Score: {}".format(neg_lld, score))
-        theta, beta = update_theta_beta(data, lr, theta, beta)
         if (score > best_score):
             best_score = score
             best_theta = theta
-            best_beta = beta
-
+            best_beta = beta        
+        val_acc_lst.append(score)
+        print("NLLK: {} \t Score: {}".format(neg_lld, score))
+        theta, beta = update_theta_beta(data, lr, theta, beta)
+        
     # TODO: You may change the return values to achieve what you want.
-    valid_acc = evaluate(data=val_data, theta=best_theta, beta=best_beta)
-    print("Final validation accuracy is {}".format(valid_acc))
     return best_theta, best_beta, val_acc_lst, train_neg_lld_lst, valid_neg_lld_lst
 
 
