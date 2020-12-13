@@ -42,6 +42,7 @@ def knn_impute_by_item(matrix, valid_data, k):
     nbrs = KNNImputer(n_neighbors=k)
     mat = nbrs.fit_transform(matrix.T)
     acc = sparse_matrix_evaluate(valid_data, mat.T)
+    print(mat)
     print("Validation Accuracy Item_based with k = {} : {}".format(k, acc))
     #####################################################################
     #                       END OF YOUR CODE                            #

@@ -5,26 +5,41 @@ from neural_network import *
 import numpy as np
 import torch
 
-def bootstrap():
+def sample(data):
+    indexes = np.random.randint(len(data["user_id"]), size=len(data["user_id"]))
+    sample = {"user_id":data["user_id"][indexes], "question_id":data["question_id"][indexes], "is_correct":data["is_correct"][indexes]}
+    return sample
+
+def sampleMat(matrix):
+    indexes = np.random.randint(matrix.shape[0], size=matrix.shape[0])
+    sampleMat = matrix[indexes, :]
+    return sampleMat
     
 
-def knn(k):
-    sparse_matrix = load_train_sparse("../data").toarray()
-    nbrs = KNNImputer(n_neighbors=k)
-    mat = nbrs.fit_transform(sparse_matrix)
-    valid_data = load_valid_csv("../data")
-    for i in len(valid_data["is_correct"])
+def knn(sampleMat, validData):
+    res = []
+    nbrs = KNNImputer(n_neighbors=11)
+    mat = nbrs.fit_transform(sampleMat)
+    for i in len(validData["user_id"]):
+        res.append()
+    return res
     
-def ir():
-    
-def nn():
+def nn(sample, validData):
     zero_train_matrix, train_matrix, valid_data, test_data = load_data()
     k = 50
     lr = 0.05
     num_epoch = 10
     lamb = 0.01
-    model = AutoEncoder(zero_train_matrix.shape[1], k)
+    model = AutoEncoder(sample.shape[1], k)
     train(model, lr, lamb, train_matrix, zero_train_matrix, valid_data, num_epoch, 0)
+    
+def bag(trainData, validData):
+    knn_res = knn(sample(trainData), validData)
+    ir_res = ir(sample(trainData), validData)
+    nn_res = nn(sample(trainData), validData)
+    
+    final_res = (knn_res + ir_res + nn_res) / 3
+    
     
     
 
@@ -32,5 +47,8 @@ def main():
     train_data = load_train_csv("../data")
     val_data = load_valid_csv("../data")
     test_data = load_public_test_csv("../data")
+    print(len(val_data["is_correct"]))
+    print(len(val_data["user_id"]))
+    print(len(valid_data["question_id"]))
     
     
