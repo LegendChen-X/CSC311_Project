@@ -77,7 +77,7 @@ class AutoEncoder(nn.Module):
         return out
 
 
-def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch):
+def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch, flag):
     """ Train the neural network, where the objective also includes
     a regularizer.
 
@@ -98,6 +98,10 @@ def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch):
     # Define optimizers and loss function.
     optimizer = optim.SGD(model.parameters(), lr=lr)
     num_student = train_data.shape[0]
+    
+    loss = []
+    valid_accuracy = []
+    test_accuracy = []
 
     for epoch in range(0, num_epoch):
         train_loss = 0.
@@ -118,6 +122,10 @@ def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch):
 
             train_loss += loss.item()
             optimizer.step()
+            
+        if flag:
+            regularization = lamb/2 *model.get_weight_norm()
+            train_loss += regularization
 
         valid_acc = evaluate(model, zero_train_data, valid_data)
         print("Epoch: {} \tTraining Cost: {:.6f}\t "
@@ -172,7 +180,10 @@ def main():
     for k in k_set:
         print("K is", k)
         model = AutoEncoder(zero_train_matrix.shape[1], k)
-        train(model, lr, lamb, train_matrix, zero_train_matrix, valid_data, num_epoch)
+        print("Withour reg")
+        train(model, lr, lamb, train_matrix, zero_train_matrix, valid_data, num_epoch, 0)
+        print("With reg")
+        train(model, lr, lamb, train_matrix, zero_train_matrix, valid_data, num_epoch, 1)
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
