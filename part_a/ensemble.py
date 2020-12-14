@@ -28,31 +28,41 @@ def newEvaluate(data, theta, beta):
         p_a = sigmoid(x)
         pred.append(p_a)
     return pred
-    
-def bag(trainData, validData, iter):
-    res = []
-    for i in range(iter):
-        sampleData = sample(trainData)
-        best_theta, best_beta, val_acc_lst, train_neg_lld_lst, valid_neg_lld_lst = irt(sampleData, validData, 0.002, 250)
-        res.append(newEvaluate(validData, best_theta, best_beta))
-    prob = np.zeros((len(validData["is_correct"]),), dtype="float")
-    for i in range(validData["is_correct"]):
+
+def bag_accuracy(data, predictions, m):
+    prob = np.zeros((len(data["is_correct"]),), dtype="float")
+    predict = np.zeros((len(data["is_correct"]),), dtype="float")
+    for i in range(len(data["is_correct"])):
         total = 0
-        for j in range(iter): total += res[j][i]
-        prob[i] = total / iter
-    predict = np.zeros((len(validData["is_correct"]),), dtype="float")
-    for i in range(len(predict)):
+        for j in range(m): total += predictions[j][i]
+        prob[i] = total / m
         if prob[i] < 0.5: predict[i] = 0
         else: predict[i] = 1
-    return np.sum((validData["is_correct"] == predict)) / len(validData["is_correct"])
+    return np.sum((data["is_correct"] == predict)) / len(data["is_correct"])    
     
+def bag(trainData, validData, testData, m):
+    res_val = []
+    res_test = []
+    for i in range(m):
+        print("####Sample {}".format(i+1))
+        sampleData = sample(trainData)
+        best_theta, best_beta, val_acc_lst, train_neg_lld_lst, valid_neg_lld_lst = irt(sampleData, validData, 0.002, 130)
+        res_val.append(newEvaluate(validData, best_theta, best_beta))
+        res_test.append(newEvaluate(testData, best_theta, best_beta))
+    
+    valid_acc = bag_accuracy(validData, res_val, m)
+    test_acc = bag_accuracy(testData, res_test, m)
+   
+    return valid_acc, test_acc
+       
 def main():
-    print("cxnb")
     train_data = load_train_csv("../data")
     val_data = load_valid_csv("../data")
     test_data = load_public_test_csv("../data")
-    print(bag(train_data, val_data, 3))
-    
+    valid_acc, test_acc = bag(train_data, val_data, test_data, 3)
+    print("Final validation accuracy is {}".format(valid_acc))
+    print("Final test accuracy is {}".format(test_acc))
+
 if __name__ == "__main__":
     main()
     
