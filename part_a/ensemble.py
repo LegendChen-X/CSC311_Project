@@ -6,7 +6,10 @@ import torch
 
 def sample(data):
     indexes = np.random.randint(len(data["user_id"]), size=len(data["user_id"]))
-    sample = {"user_id":data["user_id"][indexes], "question_id":data["question_id"][indexes], "is_correct":data["is_correct"][indexes]}
+    U = np.array(data["user_id"])[indexes].tolist()
+    Q = np.array(data["question_id"])[indexes].tolist()
+    C = np.array(data["is_correct"])[indexes].tolist()
+    sample = {"user_id": U, "question_id": Q, "is_correct":C}
     return sample
     
 def newEvaluate(data, theta, beta):
