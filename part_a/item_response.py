@@ -2,6 +2,7 @@ from utils import *
 
 import numpy as np
 import matplotlib.pyplot as plt
+import random 
 
 
 def sigmoid(x):
@@ -189,6 +190,23 @@ def main():
     print("Final validation accuracy is {}".format(valid_acc))
     test_acc = evaluate(data=test_data, theta=theta, beta=beta)
     print("Final test accuracy is {}".format(test_acc))
+    
+    # Implement part(d)
+    q_list = random.sample(range(1,1774), 5)
+    color_list = ['b', 'g', 'r', 'c', 'm']
+    
+    for i in range(5):
+        q = q_list[i]
+        c = color_list[i]
+        beta_j = beta[q]
+        theta_sort = np.sort(theta)
+        p_correct = sigmoid(theta_sort - beta_j)
+        plt.plot(theta_sort, p_correct, color = c, label = 'j{} {}'.format(i, q))
+    plt.xlim(-1.5, 4)
+    plt.xlabel("theta")
+    plt.ylabel("probability of the correct response")
+    plt.legend()
+    plt.show()
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
