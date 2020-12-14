@@ -8,6 +8,7 @@ import torch.utils.data
 
 import numpy as np
 import torch
+import matplotlib.pyplot as plt
 
 
 def load_data(base_path="../data"):
@@ -99,9 +100,8 @@ def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch, f
     optimizer = optim.SGD(model.parameters(), lr=lr)
     num_student = train_data.shape[0]
     
-    loss = []
-    valid_accuracy = []
-    test_accuracy = []
+    losses = []
+    accuracy = []
 
     for epoch in range(0, num_epoch):
         train_loss = 0.
@@ -124,10 +124,14 @@ def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch, f
             optimizer.step()
             
         if flag: train_loss += lamb/2 *model.get_weight_norm()
+        
+        losses.append(train_loss)
 
         valid_acc = evaluate(model, zero_train_data, valid_data)
+        accuracy.append(valid_acc)
         print("Epoch: {} \tTraining Cost: {:.6f}\t "
               "Valid Acc: {}".format(epoch, train_loss, valid_acc))
+    return loss, accuracy
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
@@ -175,13 +179,22 @@ def main():
     num_epoch = 10
     lamb = 0.01
     
+    xVar = []
+    for i in range(num_epoch): xVar.append(i)
+    
     for k in k_set:
         print("K is", k)
         model = AutoEncoder(zero_train_matrix.shape[1], k)
-        print("Withour reg")
-        train(model, lr, lamb, train_matrix, zero_train_matrix, valid_data, num_epoch, 0)
+        print("Without reg")
+        loss, acc = train(model, lr, lamb, train_matrix, zero_train_matrix, valid_data, num_epoch, 0)
         print("With reg")
-        train(model, lr, lamb, train_matrix, zero_train_matrix, valid_data, num_epoch, 1)
+        lossReg, accReg = train(model, lr, lamb, train_matrix, zero_train_matrix, valid_data, num_epoch, 1)
+        plt.xlabel("Epochs")
+        plt.ylabel("Loss without reg")
+        plt.plot(xVar, loss)
+        plt.legend()
+        plt.show()
+        
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
