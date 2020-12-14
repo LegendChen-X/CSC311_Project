@@ -131,7 +131,7 @@ def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch, f
         accuracy.append(valid_acc)
         print("Epoch: {} \tTraining Cost: {:.6f}\t "
               "Valid Acc: {}".format(epoch, train_loss, valid_acc))
-    return loss, accuracy
+    return losses, accuracy
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
@@ -181,19 +181,36 @@ def main():
     
     xVar = []
     for i in range(num_epoch): xVar.append(i)
+    best_k = 0
+    best_acc = -99999999.9
     
     for k in k_set:
         print("K is", k)
         model = AutoEncoder(zero_train_matrix.shape[1], k)
         print("Without reg")
         loss, acc = train(model, lr, lamb, train_matrix, zero_train_matrix, valid_data, num_epoch, 0)
+        if best_acc < max(acc):
+            best_k = k
+            best_acc = max(acc)
         print("With reg")
         lossReg, accReg = train(model, lr, lamb, train_matrix, zero_train_matrix, valid_data, num_epoch, 1)
-        plt.xlabel("Epochs")
-        plt.ylabel("Loss without reg")
-        plt.plot(xVar, loss)
-        plt.legend()
-        plt.show()
+    
+    print("Best k is", best_k)
+    model = AutoEncoder(zero_train_matrix.shape[1], best_k)
+    loss, acc = train(model, lr, lamb, train_matrix, zero_train_matrix, valid_data, num_epoch, 0)
+    plt.xlabel("Epoches")
+    plt.ylabel("Train Loss")
+    plt.plot(xVar, loss)
+    plt.legend()
+    plt.show()
+    
+    plt.xlabel("Epoches")
+    plt.ylabel("Valid Accurancy")
+    plt.plot(xVar, acc)
+    plt.legend()
+    plt.show()
+    
+    
         
     #####################################################################
     #                       END OF YOUR CODE                            #
