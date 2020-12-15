@@ -118,12 +118,11 @@ def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch, f
             target[0][nan_mask] = output[0][nan_mask]
 
             loss = torch.sum((output - target) ** 2.)
+            if flag: loss += lamb/2 * model.get_weight_norm()
             loss.backward()
 
             train_loss += loss.item()
             optimizer.step()
-            
-        if flag: train_loss += lamb/2 *model.get_weight_norm()
         
         losses.append(train_loss)
 
@@ -173,17 +172,18 @@ def main():
     #####################################################################
     # Set model hyperparameters.
     k_set = [10, 50, 100, 200, 500]
+    lamb_set = [0.001, 0.01, 0.1, 1]
 
     # Set optimization hyperparameters.
-    lr = 0.05
-    num_epoch = 10
-    lamb = 0.01
+    lr = 0.005
+    num_epoch = 50
+    lamb = 0.001
     
     xVar = []
     for i in range(num_epoch): xVar.append(i)
     best_k = 0
     best_acc = -99999999.9
-    
+
     for k in k_set:
         print("K is", k)
         model = AutoEncoder(zero_train_matrix.shape[1], k)
@@ -192,9 +192,11 @@ def main():
         if best_acc < max(acc):
             best_k = k
             best_acc = max(acc)
+        
         print("With reg")
         lossReg, accReg = train(model, lr, lamb, train_matrix, zero_train_matrix, valid_data, num_epoch, 1)
-    
+        
+ 
     print("Best k is", best_k)
     model = AutoEncoder(zero_train_matrix.shape[1], best_k)
     loss, acc = train(model, lr, lamb, train_matrix, zero_train_matrix, valid_data, num_epoch, 0)
@@ -210,8 +212,21 @@ def main():
     plt.legend()
     plt.show()
     
+    best_l = 0
+    best_acc = -99999999.9
+    model = AutoEncoder(zero_train_matrix.shape[1], 200)
+    for l in lamb_set:
+        print("Lamb is", l)
+        print("With reg")
+        lossReg, accReg = train(model, lr, l, train_matrix, zero_train_matrix, valid_data, num_epoch, 1)
+        if best_acc < max(accReg):
+            best_l = l
+            best_acc = max(accReg)
     
-        
+    model = AutoEncoder(zero_train_matrix.shape[1], 200)
+    
+    lossReg, accReg = train(model, lr, 0.001, train_matrix, zero_train_matrix, test_data, num_epoch, 1)
+    
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
