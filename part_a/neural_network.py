@@ -183,6 +183,9 @@ def main():
     for i in range(num_epoch): xVar.append(i)
     best_k = 0
     best_acc = -99999999.9
+    
+    model = AutoEncoder(zero_train_matrix.shape[1], 200)
+    loss, acc = train(model, lr, lamb, train_matrix, zero_train_matrix, valid_data, num_epoch, 0)
 
     for k in k_set:
         print("K is", k)
