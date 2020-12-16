@@ -57,6 +57,8 @@ def update_theta_beta_alpha(data, lr, theta, beta, alpha):
         # Update alpha[q]
         sig = sigmoid(alpha[q] * (theta[u] - beta[q]))
         dalpha = (sig - is_correct[i])* (theta[u] - beta[q])     
+        if ( alpha[q] - lr*dalpha > 0):
+            alpha[q] -= lr*dalpha
         # Update theta[u]
         sig = sigmoid(alpha[q] * (theta[u] - beta[q]))
         dtheta = (sig - is_correct[i]) * alpha[q]
@@ -84,8 +86,8 @@ def irt(data, val_data, lr, iterations):
 
     theta = np.random.rand(542)
     beta = np.random.rand(1774)
-    alpha = np.random.rand(1774)
-
+    alpha = np.ones(1774)
+    
     val_acc_lst = []
     best_theta = None
     best_beta = None
@@ -136,8 +138,8 @@ def main():
     test_data = load_public_test_csv("../data")
 
     # Set the hyper parameters
-    lr = 0.01
-    iterations = 200
+    lr = 0.003
+    iterations = 160
     np.random.seed(299)
     theta, beta, alpha, val_acc_lst, train_neg_lld_lst, valid_neg_lld_lst = irt(train_data, val_data, lr, iterations)
     print(alpha)
