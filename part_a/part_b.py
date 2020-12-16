@@ -141,7 +141,7 @@ def main():
 
     # Set the hyper parameters
     lr = 0.003
-    iterations = 16
+    iterations = 160
     np.random.seed(299)
     theta, beta, alpha, val_acc_lst, train_neg_lld_lst, valid_neg_lld_lst = irt(train_data, val_data, lr, iterations)
     print(alpha)
@@ -149,6 +149,14 @@ def main():
     test_theta, test_beta, test_val_acc_lst, test_train_neg_lld_lst, test_valid_neg_lld_lst = test_irt(train_data, val_data, lr, iterations)
     
     valid_acc, wrong_list = test_evaluate(data=val_data, theta=test_theta, beta=test_beta)
+    valid_acc, pred = evaluate(data=val_data, theta=theta, beta=beta, alpha=alpha)
+    
+    count = 0
+    print("The total number of wrong predictions for the original model is", len(wrong_list))
+    for i in range(len(wrong_list)):
+        if pred[wrong_list[i]] == val_data["is_correct"][wrong_list[i]]:
+            count += 1
+    print("The new model get", count)
     
     x_axis = [*range(iterations)]
     
@@ -161,18 +169,9 @@ def main():
     plt.ylabel('NLLK')
     plt.show()    
      
-    valid_acc, pred = evaluate(data=val_data, theta=theta, beta=beta, alpha=alpha)
     print("Final validation accuracy is {}".format(valid_acc))
     test_acc = evaluate(data=test_data, theta=theta, beta=beta, alpha=alpha)[0]
     print("Final test accuracy is {}".format(test_acc))
-    
-    
-    count = 0
-    print(len(wrong_list))
-    for i in range(len(wrong_list)):
-        if pred[wrong_list[i]] == val_data["is_correct"][wrong_list[i]]:
-            count += 1
-    print(count)
     
     ## Implement part(d)
     #q_list = random.sample(range(1,1774), 5)
