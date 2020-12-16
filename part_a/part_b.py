@@ -2,7 +2,9 @@ from utils import *
 
 import numpy as np
 import matplotlib.pyplot as plt
-import random 
+import random
+
+from test import *
 
 
 def sigmoid(x):
@@ -101,7 +103,7 @@ def irt(data, val_data, lr, iterations):
         train_neg_lld_lst.append(neg_lld)
         val_neg_lld = neg_log_likelihood(val_data, theta=theta, beta=beta, alpha = alpha)
         valid_neg_lld_lst.append(val_neg_lld)
-        score = evaluate(data=val_data, theta=theta, beta=beta, alpha = alpha)
+        score = evaluate(data=val_data, theta=theta, beta=beta, alpha = alpha)[0]
         if (score > best_score):
             best_score = score
             best_theta = theta.copy()
@@ -130,7 +132,7 @@ def evaluate(data, theta, beta, alpha):
         p_a = sigmoid(x)
         pred.append(p_a >= 0.5)
     return np.sum((data["is_correct"] == np.array(pred))) \
-           / len(data["is_correct"])
+           / len(data["is_correct"]), pred
 
 def main():
     train_data = load_train_csv("../data")
@@ -139,10 +141,14 @@ def main():
 
     # Set the hyper parameters
     lr = 0.003
-    iterations = 160
+    iterations = 16
     np.random.seed(299)
     theta, beta, alpha, val_acc_lst, train_neg_lld_lst, valid_neg_lld_lst = irt(train_data, val_data, lr, iterations)
     print(alpha)
+    
+    test_theta, test_beta, test_val_acc_lst, test_train_neg_lld_lst, test_valid_neg_lld_lst = test_irt(train_data, val_data, lr, iterations)
+    
+    valid_acc, wrong_list = test_evaluate(data=val_data, theta=test_theta, beta=test_beta)
     
     x_axis = [*range(iterations)]
     
@@ -155,10 +161,18 @@ def main():
     plt.ylabel('NLLK')
     plt.show()    
      
-    valid_acc = evaluate(data=val_data, theta=theta, beta=beta, alpha=alpha)
+    valid_acc, pred = evaluate(data=val_data, theta=theta, beta=beta, alpha=alpha)
     print("Final validation accuracy is {}".format(valid_acc))
-    test_acc = evaluate(data=test_data, theta=theta, beta=beta, alpha=alpha)
+    test_acc = evaluate(data=test_data, theta=theta, beta=beta, alpha=alpha)[0]
     print("Final test accuracy is {}".format(test_acc))
+    
+    
+    count = 0
+    print(len(wrong_list))
+    for i in range(len(wrong_list)):
+        if pred[wrong_list[i]] == val_data["is_correct"][wrong_list[i]]:
+            count += 1
+    print(count)
     
     ## Implement part(d)
     #q_list = random.sample(range(1,1774), 5)
