@@ -173,22 +173,38 @@ def main():
     test_acc = evaluate(data=test_data, theta=theta, beta=beta, alpha=alpha)[0]
     print("Final test accuracy is {}".format(test_acc))
     
-    ## Implement part(d)
-    #q_list = random.sample(range(1,1774), 5)
-    #color_list = ['b', 'g', 'r', 'c', 'm']
+    # Plot the probabillity of correct response as a function of theta.
+    # Randomly pick 5 questions.
+    q_list = random.sample(range(1,1774), 5)
+    color_list = ['b', 'g', 'r', 'c', 'm']
     
-    #for i in range(5):
-        #q = q_list[i]
-        #c = color_list[i]
-        #beta_j = beta[q]
-        #theta_sort = np.sort(theta)
-        #p_correct = sigmoid(theta_sort - beta_j)
-        #plt.plot(theta_sort, p_correct, color = c, label = 'j{} {}'.format(i, q))
-    #plt.xlim(-1.5, 4)
-    #plt.xlabel("theta")
-    #plt.ylabel("probability of the correct response")
-    #plt.legend()
-    #plt.show()
+    for i in range(5):
+        q = q_list[i]
+        c = color_list[i]
+        beta_j = beta[q]
+        theta_sort = np.sort(theta)
+        p_correct = sigmoid(theta_sort - beta_j)
+        plt.plot(theta_sort, p_correct, color = c, label = 'j{} {}'.format(i, q))
+    plt.xlim(-1.5, 4)
+    plt.xlabel("theta")
+    plt.ylabel("probability of the correct response")
+    plt.legend()
+    plt.show()
+    
+    # Plot the same questions as I get from question 2
+    q_original_list = [2, 1740,1367, 1035, 36]
+    for i in range(5):
+        q = q_original_list[i]
+        c = color_list[i]
+        beta_j = beta[q]
+        theta_sort = np.sort(theta)
+        p_correct = sigmoid(theta_sort - beta_j)
+        plt.plot(theta_sort, p_correct, color = c, label = 'j{} {}'.format(i, q))
+    plt.xlim(-1.5, 4)
+    plt.xlabel("theta")
+    plt.ylabel("probability of the correct response")
+    plt.legend()
+    plt.show()    
 
 if __name__ == "__main__":
     main()
